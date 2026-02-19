@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>RUN DROP - 한강 러닝 & 기록</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app-container">
+    <div id="layer-toggle-wrap">
+        <button class="layer-btn active" id="btn-layer-drop" onclick="switchLayer('drop')">🏃 실시간 러너</button>
+        <button class="layer-btn" id="btn-layer-place" onclick="switchLayer('place')">💧 주변 스팟</button>
+        <button class="layer-btn" id="btn-layer-record" onclick="switchLayer('record')">📊 내 기록</button>
+    </div>
+    
+    <div id="guide-msg">📍 지도를 클릭하여 위치를 남기세요</div>
+    <div id="map"></div>
+    <button id="fab-drop" onclick="toggleDropMode()"></button>
+
+    <div id="record-view">
+        <div class="record-header">오늘의 러닝 요약</div>
+        
+        <div class="record-grid-main">
+            <div class="record-card main-card" onclick="openRecordDetail('심장강화점수')">
+                <div class="title">❤️ 심장강화점수</div>
+                <div class="value">32<span class="unit">점</span></div>
+            </div>
+            <div class="record-card main-card" onclick="openRecordDetail('걸음수')">
+                <div class="title">👣 걸음수</div>
+                <div class="value">8,432<span class="unit">걸음</span></div>
+            </div>
+        </div>
+
+        <div class="record-grid-sub">
+            <div class="record-card" onclick="openRecordDetail('소모칼로리')">
+                <div class="title">🔥 소모칼로리</div>
+                <div class="value">420<span class="unit">kcal</span></div>
+            </div>
+            <div class="record-card" onclick="openRecordDetail('이동거리')">
+                <div class="title">📍 이동거리</div>
+                <div class="value">5.2<span class="unit">km</span></div>
+            </div>
+            <div class="record-card" onclick="openRecordDetail('운동시간')">
+                <div class="title">⏱️ 운동시간</div>
+                <div class="value">45<span class="unit">분</span></div>
+            </div>
+        </div>
+        
+        <div style="background: #f8f9fa; border-radius: 20px; padding: 30px; text-align: center; margin-top: 10px;">
+            <div style="font-size: 40px; margin-bottom: 10px;">🏅</div>
+            <div style="font-weight: 800; font-size: 16px; margin-bottom: 6px;">훌륭한 페이스입니다!</div>
+            <div style="font-size: 13px; color: #888;">이번 주 목표 달성까지 2km 남았어요.</div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSheets()"></div>
+
+    <div class="bottom-sheet" id="sheet-record-detail">
+        <div class="drag-area"><div class="sheet-drag-handle"></div></div>
+        <div class="sheet-header">
+            <div id="record-detail-icon" style="font-size: 38px;"></div>
+            <div>
+                <div id="record-detail-title" style="font-size: 18px; font-weight: 800;"></div>
+                <div id="record-detail-desc" style="font-size: 13px; font-weight: bold; margin-top: 4px; color:#888;"></div>
+            </div>
+        </div>
+        
+        <div class="stat-tabs">
+            <div class="stat-tab active" id="tab-D" onclick="changeRecordTab('D')">일간</div>
+            <div class="stat-tab" id="tab-W" onclick="changeRecordTab('W')">주간</div>
+            <div class="stat-tab" id="tab-M" onclick="changeRecordTab('M')">월간</div>
+        </div>
+
+        <div class="stat-content">
+            <div class="stat-val" id="record-detail-value"></div>
+            <div class="stat-desc" id="record-detail-period-text">오늘 누적 기록입니다.</div>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="sheet-create">
+        <div class="drag-area"><div class="sheet-drag-handle"></div></div>
+        <div style="font-size: 18px; font-weight: 800; margin-bottom: 15px; flex-shrink: 0;">지금 나의 러닝 바이브</div>
+        
+        <div class="emoji-picker-container" id="emoji-picker">
+            <div class="emoji-option selected" onclick="selectEmoji(this, '🏃')">🏃</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🔥')">🔥</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '💦')">💦</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '⏱️')">⏱️</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🎧')">🎧</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '📸')">📸</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🏅')">🏅</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '👟')">👟</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🐶')">🐶</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🚴')">🚴</div>
+            <div class="emoji-option" onclick="selectEmoji(this, '🌙')">🌙</div>
+        </div>
+        
+        <div class="media-preview-container" id="create-media-preview-box">
+            <img id="create-media-preview" class="media-preview" src=""/>
+            <button class="remove-media-btn" onclick="clearMedia('create')">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+
+        <div class="chat-input-wrapper">
+            <input type="file" id="create-file-input" class="hidden-file" accept="image/*" onchange="handleFileUpload(event, 'create')">
+            <label for="create-file-input" class="media-btn" id="create-camera-btn">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
+            </label>
+            <div class="input-pill">
+                <input type="text" id="input-text" placeholder="오늘 러닝 어때요?" maxlength="20" />
+                <button class="send-btn" onclick="submitDrop()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="sheet-detail">
+        <div class="drag-area"><div class="sheet-drag-handle"></div></div>
+        <div class="sheet-header">
+            <div id="detail-emoji" style="font-size: 38px;"></div>
+            <div>
+                <div id="detail-title" style="font-size: 16px; font-weight: 800;"></div>
+                <div id="detail-subtitle" style="font-size: 13px; font-weight: bold; margin-top: 4px;"></div>
+            </div>
+        </div>
+        
+        <div class="profile-row" id="detail-profile-row">
+            <div><span id="detail-author"></span></div>
+        </div>
+
+        <div class="scrollable-content" id="detail-scroll-area">
+            <div id="detail-main-media" style="margin-bottom: 12px;"></div>
+            <div class="feed-list" id="detail-comment-list"></div>
+        </div>
+
+        <div class="media-preview-container" id="comment-media-preview-box">
+            <img id="comment-media-preview" class="media-preview" src=""/>
+            <button class="remove-media-btn" onclick="clearMedia('comment')">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+
+        <div class="chat-input-wrapper">
+            <input type="file" id="comment-file-input" class="hidden-file" accept="image/*" onchange="handleFileUpload(event, 'comment')">
+            <label for="comment-file-input" class="media-btn" id="comment-camera-btn">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
+            </label>
+            <div class="input-pill">
+                <input type="text" id="detail-comment-input" placeholder="스팟에 흔적 남기기..." />
+                <button class="send-btn" onclick="submitComment()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
