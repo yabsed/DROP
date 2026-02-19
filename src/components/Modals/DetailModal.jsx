@@ -25,21 +25,23 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
         ))}
       </div>
 
-      {commentMedia?.url && (
-        <div className="media-preview-wrap">
-          <img src={commentMedia.url} className="media-preview" alt="Preview" />
-          <button onClick={() => setCommentMedia(null)}>✕</button>
-        </div>
-      )}
+      <div className="compose-card">
+        {commentMedia?.url && (
+          <div className="media-preview-wrap">
+            <img src={commentMedia.url} className="media-preview" alt="Preview" />
+            <button onClick={() => setCommentMedia(null)}>✕</button>
+          </div>
+        )}
 
-      <div className="chat-input-wrap">
-        <label className={`media-btn ${commentMedia ? 'has-file' : ''}`}>
-          📷
-          <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'comment')} />
-        </label>
-        <div className="input-pill">
-          <input value={commentText} onChange={(event) => setCommentText(event.target.value)} placeholder="스팟에 흔적 남기기..." />
-          <button onClick={submitComment}>➤</button>
+        <div className="chat-input-wrap">
+          <label className={`media-btn ${commentMedia ? 'has-file' : ''}`}>
+            📷
+            <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'comment')} />
+          </label>
+          <div className="input-pill">
+            <input value={commentText} onChange={(event) => setCommentText(event.target.value)} placeholder="스팟에 흔적 남기기..." />
+            <button onClick={submitComment}>➤</button>
+          </div>
         </div>
       </div>
     </section>

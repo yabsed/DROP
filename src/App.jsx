@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Map } from './components/Map';
-import { SummaryPanel } from './components/Sidebar/SummaryPanel';
 import { LayerToggle } from './components/LayerToggle/LayerToggle';
 import { RecordView } from './components/RecordView/RecordView';
 import { CreateDropModal } from './components/Modals/CreateDropModal';
@@ -121,8 +120,6 @@ export default function App() {
   return (
     <div className="desktop-bg">
       <div className="app-shell">
-        <SummaryPanel dropsCount={drops.length} layer={layer} />
-
         <main className="phone-stage">
           <LayerToggle layer={layer} setLayer={setLayer} setIsDropMode={setIsDropMode} />
 

@@ -29,6 +29,13 @@ export function Map({ layer, isDropMode, drops, onMapClick, onMarkerClick, setMa
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
       const group = L.layerGroup().addTo(map);
 
+      const rafId = requestAnimationFrame(() => {
+        map.invalidateSize();
+      });
+
+      const resizeHandler = () => map.invalidateSize();
+      window.addEventListener('resize', resizeHandler);
+
       mapRef.current = map;
       markerGroupRef.current = group;
       setMapReady(true);
@@ -40,6 +47,8 @@ export function Map({ layer, isDropMode, drops, onMapClick, onMarkerClick, setMa
       });
 
       return () => {
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('resize', resizeHandler);
         map.remove();
         mapRef.current = null;
         markerGroupRef.current = null;
@@ -49,6 +58,11 @@ export function Map({ layer, isDropMode, drops, onMapClick, onMarkerClick, setMa
       setMapError('지도를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.');
     }
   }, []);
+
+  useEffect(() => {
+    if (!mapRef.current || layer === LAYER.RECORD) return;
+    mapRef.current.invalidateSize();
+  }, [layer]);
 
   useEffect(() => {
     if (!mapRef.current || !markerGroupRef.current) return;

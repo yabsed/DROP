@@ -15,21 +15,23 @@ export function CreateDropModal({ selectedEmoji, setSelectedEmoji, draftMedia, s
         ))}
       </div>
 
-      {draftMedia?.url && (
-        <div className="media-preview-wrap">
-          <img src={draftMedia.url} className="media-preview" alt="Preview" />
-          <button onClick={() => setDraftMedia(null)}>✕</button>
-        </div>
-      )}
+      <div className="compose-card">
+        {draftMedia?.url && (
+          <div className="media-preview-wrap">
+            <img src={draftMedia.url} className="media-preview" alt="Preview" />
+            <button onClick={() => setDraftMedia(null)}>✕</button>
+          </div>
+        )}
 
-      <div className="chat-input-wrap">
-        <label className={`media-btn ${draftMedia ? 'has-file' : ''}`}>
-          📷
-          <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'create')} />
-        </label>
-        <div className="input-pill">
-          <input value={draftText} maxLength={20} onChange={(event) => setDraftText(event.target.value)} placeholder="오늘 러닝 어때요?" />
-          <button onClick={submitDrop}>➤</button>
+        <div className="chat-input-wrap">
+          <label className={`media-btn ${draftMedia ? 'has-file' : ''}`}>
+            📷
+            <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'create')} />
+          </label>
+          <div className="input-pill">
+            <input value={draftText} maxLength={20} onChange={(event) => setDraftText(event.target.value)} placeholder="오늘 러닝 어때요?" />
+            <button onClick={submitDrop}>➤</button>
+          </div>
         </div>
       </div>
     </section>
