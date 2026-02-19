@@ -8,67 +8,90 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; }
-        body { background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body { background-color: #f4f5f7; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        #app-container { width: 100%; max-width: 400px; height: 100%; max-height: 850px; background: #fff; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        @media (min-width: 401px) { #app-container { height: 90vh; border-radius: 30px; border: 8px solid #333; } }
+        #app-container { width: 100%; max-width: 400px; height: 100%; max-height: 850px; background: #fff; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        @media (min-width: 401px) { #app-container { height: 90vh; border-radius: 36px; border: 10px solid #111; } }
 
-        /* 상단 탭 & 맵 */
-        #layer-toggle-wrap { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 30px; display: flex; box-shadow: 0 4px 15px rgba(0,0,0,0.1); backdrop-filter: blur(10px); }
-        .layer-btn { padding: 10px 18px; border: none; background: transparent; border-radius: 25px; font-size: 13px; font-weight: 700; color: #888; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-        .layer-btn.active { background: #111; color: #fff; }
+        /* 상단 탭 */
+        #layer-toggle-wrap { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); z-index: 10; background: rgba(255,255,255,0.85); padding: 4px; border-radius: 30px; display: flex; box-shadow: 0 4px 15px rgba(0,0,0,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5); }
+        .layer-btn { padding: 10px 16px; border: none; background: transparent; border-radius: 25px; font-size: 13px; font-weight: 700; color: #888; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .layer-btn.active { background: #111; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        
         #map { width: 100%; height: 100%; z-index: 1; }
-        #guide-msg { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 5; background: #ff3b30; color: #fff; padding: 10px 20px; border-radius: 15px; font-size: 13px; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(255,59,48,0.3); }
+        #guide-msg { position: absolute; top: 90px; left: 50%; transform: translateX(-50%); z-index: 5; background: #111; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* FAB 버튼 (+) */
-        #fab-drop { position: absolute; bottom: 30px; right: 20px; width: 60px; height: 60px; background: #111; color: #fff; border-radius: 50%; border: none; font-size: 32px; font-weight: 300; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* FAB 버튼 (+) 디테일 개선 */
+        #fab-drop { position: absolute; bottom: 35px; right: 25px; width: 64px; height: 64px; background: #111; border-radius: 50%; border: none; cursor: pointer; z-index: 10; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #fab-drop::before, #fab-drop::after { content: ''; position: absolute; background: #fff; border-radius: 2px; }
+        #fab-drop::before { width: 24px; height: 3px; }
+        #fab-drop::after { width: 3px; height: 24px; }
+        #fab-drop:active { transform: scale(0.9); }
         #fab-drop.cancel { background: #ff3b30; transform: rotate(45deg); }
 
-        /* 바텀 시트 공통 */
-        .bottom-sheet { position: absolute; bottom: -100%; left: 0; width: 100%; max-height: 85%; background: #fff; border-radius: 24px 24px 0 0; padding: 25px 20px; z-index: 20; transition: bottom 0.4s cubic-bezier(0.1, 0.8, 0.2, 1); box-shadow: 0 -5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+        /* ✨ 바텀 시트 구조 전면 수정 (내용물에 맞춰 높이 자동 조절) ✨ */
+        .bottom-sheet { position: absolute; bottom: -100%; left: 0; width: 100%; height: auto; max-height: 85vh; background: #fff; border-radius: 28px 28px 0 0; padding: 12px 20px 24px 20px; z-index: 20; transition: bottom 0.35s cubic-bezier(0.1, 0.8, 0.2, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
         .bottom-sheet.active { bottom: 0; }
-        .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 15; display: none; }
-        .overlay.active { display: block; }
-        .sheet-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; flex-shrink: 0; position: relative; }
-        .scrollable-content { overflow-y: auto; flex: 1; margin-bottom: 15px; padding-right: 5px; scrollbar-width: none; }
+        .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 15; display: none; opacity: 0; transition: opacity 0.3s; }
+        .overlay.active { display: block; opacity: 1; }
+        
+        /* 모바일스러운 드래그 핸들 (상단 회색 바) */
+        .sheet-drag-handle { width: 40px; height: 5px; background: #e0e0e0; border-radius: 3px; margin: 0 auto 15px auto; }
 
-        /* 뒤로가기 버튼 */
-        .back-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 14px; color: #888; cursor: pointer; font-weight: bold; }
+        .sheet-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+        
+        /* 목록 스크롤 최적화 */
+        .scrollable-content { overflow-y: auto; max-height: 50vh; padding-right: 5px; scrollbar-width: none; margin-bottom: 12px; }
+        .scrollable-content::-webkit-scrollbar { display: none; }
+
+        /* 프로필 및 헤더 영역 */
+        .profile-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 16px; background: #f8f9fa; border-radius: 16px; font-size: 13px; font-weight: 600; color: #333; }
+        .dm-btn { background: #007aff; color: #fff; border: none; padding: 8px 14px; border-radius: 14px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,122,255,0.2); }
+
+        /* ✨ 세련된 입력창 모듈 (여백 찌그러짐 완벽 해결) ✨ */
+        .chat-input-wrapper { display: flex; align-items: flex-end; gap: 8px; width: 100%; margin-top: auto; }
+        .hidden-file { display: none; }
+        
+        /* 카메라 버튼 (SVG로 교체) */
+        .media-btn { display: flex; justify-content: center; align-items: center; width: 44px; height: 44px; background: #f4f5f7; border-radius: 50%; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+        .media-btn svg { width: 20px; height: 20px; fill: #666; transition: 0.2s; }
+        .media-btn.has-file { background: #007aff; }
+        .media-btn.has-file svg { fill: #fff; }
+        
+        /* 텍스트 입력창 (둥근 필 형태) */
+        .input-pill { flex: 1; display: flex; align-items: center; background: #f4f5f7; border-radius: 22px; padding: 4px 6px 4px 16px; min-height: 44px; }
+        .input-pill input[type="text"] { flex: 1; border: none; background: transparent; outline: none; font-size: 14px; color: #111; padding: 8px 0; }
+        .input-pill input::placeholder { color: #aaa; font-weight: 500; }
+        
+        /* 전송 버튼 (SVG 화살표) */
+        .send-btn { width: 34px; height: 34px; background: #007aff; color: #fff; border: none; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,122,255,0.25); }
+        .send-btn svg { width: 14px; height: 14px; fill: #fff; position: relative; left: 1px; }
 
         /* 미디어 미리보기 */
-        .media-preview-container { margin-bottom: 10px; position: relative; display: none; }
+        .media-preview-container { margin-bottom: 12px; position: relative; display: none; width: fit-content; }
         .media-preview-container.active { display: block; }
-        .media-preview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; border: 1px solid #eee; }
-        .remove-media-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 12px; display: flex; justify-content: center; align-items: center; }
+        .media-preview { width: 90px; height: 90px; object-fit: cover; border-radius: 12px; border: 2px solid #007aff; box-shadow: 0 4px 10px rgba(0,122,255,0.15); }
+        .remove-media-btn { position: absolute; top: -6px; right: -6px; background: #ff3b30; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .remove-media-btn svg { width: 10px; height: 10px; fill: #fff; }
 
-        /* 세련된 채팅형 입력창 (수정됨!) */
-        .chat-input-pill { display: flex; align-items: center; gap: 8px; background: #f0f2f5; border-radius: 24px; padding: 6px 6px 6px 14px; flex-shrink: 0; margin-top: auto; }
-        .icon-btn { display: flex; justify-content: center; align-items: center; cursor: pointer; fill: #888; transition: 0.2s; width: 28px; height: 28px; }
-        .icon-btn:hover { fill: #111; }
-        .chat-input-pill input[type="text"] { flex: 1; border: none; background: transparent; outline: none; font-size: 15px; padding: 8px 0; color: #111; }
-        .chat-input-pill input::placeholder { color: #aaa; }
-        .send-btn { background: #007aff; color: #fff; border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,122,255,0.2); transition: 0.2s; flex-shrink: 0; }
-        .send-btn:active { transform: scale(0.9); }
-        .send-btn svg { width: 16px; height: 16px; fill: #fff; }
-
-        /* 아이템 리스트 (게시글 & 댓글) */
+        /* 피드 & 댓글 리스트 */
         .feed-list { display: flex; flex-direction: column; gap: 12px; }
-        .feed-item { background: #fff; border: 1px solid #eee; padding: 14px; border-radius: 16px; font-size: 14px; color: #333; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,0.02); cursor: pointer; }
-        .feed-item.comment { background: #f8f9fa; border: none; cursor: default; }
-        .feed-header { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
-        .feed-emoji { font-size: 20px; }
-        .feed-time { font-size: 11px; color: #999; margin-left: auto; }
-        .feed-media { width: 100%; border-radius: 10px; margin-top: 10px; max-height: 160px; object-fit: cover; }
+        .feed-item { background: #f8f9fa; padding: 14px 16px; border-radius: 18px; font-size: 14px; color: #222; line-height: 1.4; border: 1px solid #f0f0f0; }
+        .feed-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; color: #888; font-weight: 600; }
+        .feed-media { width: 100%; border-radius: 12px; margin-top: 10px; max-height: 200px; object-fit: cover; }
 
-        /* 바이브 작성 시트 전용 */
-        .emoji-picker-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-bottom: 15px; }
-        .emoji-option { font-size: 30px; padding: 10px; background: #f5f5f5; border-radius: 16px; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-        .emoji-option.selected { background: #111; color: #fff; transform: scale(1.1); }
+        /* 이모지 픽커 */
+        .emoji-picker-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-bottom: 10px; }
+        .emoji-option { font-size: 32px; padding: 12px; background: #f4f5f7; border-radius: 18px; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+        .emoji-option.selected { background: #111; transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
 
         /* 마커 디자인 */
-        .emoji-marker { font-size: 34px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); animation: float 2s infinite ease-in-out; cursor: pointer; text-align: center; }
+        .emoji-marker { font-size: 36px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); animation: float 2s infinite ease-in-out; cursor: pointer; text-align: center; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .place-marker { width: 42px; height: 42px; background: #007cff; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 15px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: 900; cursor: pointer; letter-spacing: -0.5px; }
+
+        /* DM 리스트 */
+        .dm-list-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+        .dm-avatar { width: 44px; height: 44px; background: #111; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -77,13 +100,15 @@
     <div id="layer-toggle-wrap">
         <button class="layer-btn active" id="btn-layer-drop" onclick="switchLayer('drop')">💧 실시간 드롭</button>
         <button class="layer-btn" id="btn-layer-place" onclick="switchLayer('place')">🏪 GS25 스팟</button>
+        <button class="layer-btn" id="btn-layer-dm" onclick="switchLayer('dm')">💬 메시지</button>
     </div>
     <div id="guide-msg">📍 지도를 클릭하여 위치를 지정하세요</div>
     <div id="map"></div>
-    <button id="fab-drop" onclick="toggleDropMode()">+</button>
+    <button id="fab-drop" onclick="toggleDropMode()"></button>
     <div class="overlay" id="overlay" onclick="closeSheets()"></div>
 
     <div class="bottom-sheet" id="sheet-create">
+        <div class="sheet-drag-handle"></div>
         <div style="font-size: 18px; font-weight: 800; margin-bottom: 15px;">지금 나의 바이브</div>
         <div class="emoji-picker-container" id="emoji-picker">
             <div class="emoji-option selected" onclick="selectEmoji(this, '🍺')">🍺</div>
@@ -96,83 +121,87 @@
         
         <div class="media-preview-container" id="create-media-preview-box">
             <img id="create-media-preview" class="media-preview" src=""/>
-            <video id="create-media-preview-vid" class="media-preview" src="" autoplay muted loop style="display:none;"></video>
-            <button class="remove-media-btn" onclick="clearMedia('create')">✕</button>
-        </div>
-
-        <div class="chat-input-pill">
-            <label class="icon-btn">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
-                <input type="file" id="create-file-input" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event, 'create')">
-            </label>
-            <input type="text" id="input-text" placeholder="간결하게 한 마디 적어보세요" maxlength="20" />
-            <button class="send-btn" onclick="submitDrop()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <button class="remove-media-btn" onclick="clearMedia('create')">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
             </button>
         </div>
-    </div>
 
-    <div class="bottom-sheet" id="sheet-board-list">
-        <div class="sheet-header">
-            <div style="font-size: 28px;">🏪</div>
-            <div>
-                <div id="board-name-display" style="font-size: 18px; font-weight: 800;">GS25 스팟</div>
-                <div style="font-size: 12px; color: #888;">이 장소에 남겨진 이야기들</div>
+        <div class="chat-input-wrapper">
+            <input type="file" id="create-file-input" class="hidden-file" accept="image/*" onchange="handleFileUpload(event, 'create')">
+            <label for="create-file-input" class="media-btn" id="create-camera-btn">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
+            </label>
+            <div class="input-pill">
+                <input type="text" id="input-text" placeholder="간결하게 한 마디 적어보세요" maxlength="20" />
+                <button class="send-btn" onclick="submitDrop()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
             </div>
-        </div>
-        
-        <div class="scrollable-content">
-            <div class="feed-list" id="board-post-list"></div>
-        </div>
-
-        <div class="media-preview-container" id="board-media-preview-box">
-            <img id="board-media-preview" class="media-preview" src=""/>
-            <video id="board-media-preview-vid" class="media-preview" src="" autoplay muted loop style="display:none;"></video>
-            <button class="remove-media-btn" onclick="clearMedia('board')">✕</button>
-        </div>
-
-        <div class="chat-input-pill">
-            <label class="icon-btn">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
-                <input type="file" id="board-file-input" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event, 'board')">
-            </label>
-            <input type="text" id="board-input-text" placeholder="이곳에 새 글 남기기..." />
-            <button class="send-btn" onclick="submitBoardPost()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
         </div>
     </div>
 
     <div class="bottom-sheet" id="sheet-detail">
+        <div class="sheet-drag-handle"></div>
         <div class="sheet-header">
-            <div id="detail-emoji" style="font-size: 32px;"></div>
+            <div id="detail-emoji" style="font-size: 38px;"></div>
             <div>
-                <div id="detail-title" style="font-size: 16px; font-weight: 800; word-break: keep-all;"></div>
-                <div id="detail-subtitle" style="font-size: 12px; font-weight: bold; margin-top: 4px;"></div>
+                <div id="detail-title" style="font-size: 16px; font-weight: 800;"></div>
+                <div id="detail-subtitle" style="font-size: 13px; font-weight: bold; margin-top: 4px;"></div>
             </div>
-            <button id="detail-back-btn" class="back-btn" onclick="goBackToBoard()" style="display:none;">← 목록</button>
         </div>
         
-        <div class="scrollable-content">
-            <div id="detail-main-media" style="margin-bottom: 10px;"></div>
+        <div class="profile-row" id="detail-profile-row">
+            <div><span id="detail-author"></span></div>
+            <button class="dm-btn" id="detail-dm-btn" onclick="startDM()">DM 보내기</button>
+        </div>
+
+        <div class="scrollable-content" id="detail-scroll-area">
+            <div id="detail-main-media" style="margin-bottom: 12px;"></div>
             <div class="feed-list" id="detail-comment-list"></div>
         </div>
 
         <div class="media-preview-container" id="comment-media-preview-box">
-            <img id="comment-media-preview" class="media-preview" src="" style="max-height: 100px;"/>
-            <video id="comment-media-preview-vid" class="media-preview" src="" autoplay muted loop style="max-height: 100px; display:none;"></video>
-            <button class="remove-media-btn" onclick="clearMedia('comment')">✕</button>
+            <img id="comment-media-preview" class="media-preview" src=""/>
+            <button class="remove-media-btn" onclick="clearMedia('comment')">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
         </div>
 
-        <div class="chat-input-pill">
-            <label class="icon-btn">
+        <div class="chat-input-wrapper">
+            <input type="file" id="comment-file-input" class="hidden-file" accept="image/*" onchange="handleFileUpload(event, 'comment')">
+            <label for="comment-file-input" class="media-btn" id="comment-camera-btn">
                 <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm8 10l-3-4-3 4h12l-4-5-2 3z"/></svg>
-                <input type="file" id="comment-file-input" accept="image/*,video/*" style="display: none;" onchange="handleFileUpload(event, 'comment')">
             </label>
-            <input type="text" id="detail-comment-input" placeholder="댓글을 입력하세요..." />
-            <button class="send-btn" onclick="submitComment()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+            <div class="input-pill">
+                <input type="text" id="detail-comment-input" placeholder="댓글을 남겨보세요..." />
+                <button class="send-btn" onclick="submitComment()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-sheet" id="sheet-dm-list">
+        <div class="sheet-drag-handle"></div>
+        <div style="font-size: 20px; font-weight: 800; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid #eee;">💬 메시지함</div>
+        <div class="scrollable-content" id="dm-list-container"></div>
+    </div>
+
+    <div class="bottom-sheet" id="sheet-dm-room">
+        <div class="sheet-drag-handle"></div>
+        <div class="sheet-header" style="justify-content: space-between;">
+            <div style="font-size: 16px; font-weight: 800;" id="dm-room-title">상대방 이름</div>
+            <button onclick="openSheet('sheet-dm-list')" style="background:none; border:none; font-weight:bold; color:#007aff; cursor:pointer;">← 목록</button>
+        </div>
+        <div class="scrollable-content" id="dm-message-list" style="margin-bottom: 12px;"></div>
+        
+        <div class="chat-input-wrapper">
+            <div class="input-pill">
+                <input type="text" id="dm-input-text" placeholder="메시지 보내기..." />
+                <button class="send-btn" onclick="sendDMMessage()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -184,16 +213,17 @@
 
     let isDropMode = false;
     let selectedLatLng = null;
-    let currentLayer = 'drop';
+    let currentLayer = 'drop'; 
     let markers = { drop: [], place: [] };
     let currentEmoji = '🍺';
     
-    // 상태 관리 객체 (type: 'drop' | 'board', id: post_id, gs_id: store_id)
-    let activeContext = { type: null, id: null, gs_id: null, data: null }; 
+    let activeContext = { type: null, id: null, data: null }; 
+    let activeDMRoom = null;
     let activeInterval = null;
-    let tempMedia = { create: {url:null, type:null}, board: {url:null, type:null}, comment: {url:null, type:null} };
+    let tempMedia = { create: {url:null}, comment: {url:null} };
 
-    // --- 위치 선택 & FAB ---
+    const generateAuthor = () => `익명_${Math.floor(Math.random()*9000)+1000}`;
+
     function toggleDropMode() {
         if (currentLayer !== 'drop') switchLayer('drop');
         isDropMode = !isDropMode;
@@ -219,23 +249,26 @@
         resetDropMode();
     });
 
-    // --- 레이어 전환 ---
     function switchLayer(layer) {
         currentLayer = layer;
         document.getElementById('btn-layer-drop').classList.toggle('active', layer === 'drop');
         document.getElementById('btn-layer-place').classList.toggle('active', layer === 'place');
+        document.getElementById('btn-layer-dm').classList.toggle('active', layer === 'dm');
         document.getElementById('fab-drop').style.display = (layer === 'drop') ? 'flex' : 'none';
-        renderLayers();
+        
+        closeSheets();
+        if (layer === 'dm') renderDMList();
+        else renderLayers();
     }
+    
     function renderLayers() {
         markers.drop.forEach(m => map.removeLayer(m));
         markers.place.forEach(m => map.removeLayer(m));
         markers.drop = []; markers.place = [];
         if (currentLayer === 'drop') renderDrops();
-        else renderPlaces();
+        else if (currentLayer === 'place') renderPlaces();
     }
 
-    // --- 실시간 드롭 ---
     function renderDrops() {
         let drops = JSON.parse(localStorage.getItem('drops') || '[]');
         const now = Date.now();
@@ -245,71 +278,38 @@
         drops.forEach(d => {
             const icon = L.divIcon({ className: 'custom-div-icon', html: `<div class="emoji-marker">${d.emoji}</div>`, iconSize: [40, 40] });
             const marker = L.marker([d.lat, d.lng], { icon }).addTo(map);
-            marker.on('click', () => {
-                activeContext = { type: 'drop', id: d.id, data: d };
-                openDetailView();
-            });
+            marker.on('click', () => { activeContext = { type: 'drop', id: d.id, data: d }; openDetailView(); });
             markers.drop.push(marker);
         });
     }
+    
     function submitDrop() {
         const text = document.getElementById('input-text').value;
         if (!text.trim() && !tempMedia.create.url) return;
         const drops = JSON.parse(localStorage.getItem('drops') || '[]');
-        drops.push({ id: Date.now(), lat: selectedLatLng.lat, lng: selectedLatLng.lng, emoji: currentEmoji, text: text, createdAt: Date.now(), media: tempMedia.create.url ? {...tempMedia.create} : null });
+        drops.push({ id: Date.now(), lat: selectedLatLng.lat, lng: selectedLatLng.lng, emoji: currentEmoji, text: text, createdAt: Date.now(), author: generateAuthor(), media: tempMedia.create.url ? {...tempMedia.create} : null });
         localStorage.setItem('drops', JSON.stringify(drops));
         document.getElementById('input-text').value = '';
         clearMedia('create'); renderLayers(); closeSheets();
     }
 
-    // --- GS25 게시판 목록 뷰 ---
     function renderPlaces() {
-        const places = [{ id: 'gs_1', name: 'GS25 서울시청점', lat: 37.5668, lng: 126.9785 }, { id: 'gs_2', name: 'GS25 신림점', lat: 37.5658, lng: 126.9772 }];
+        const places = [
+            { id: 'gs_1', name: 'GS25 서울시청점', lat: 37.5668, lng: 126.9785 },
+            { id: 'gs_2', name: 'GS25 덕수궁점', lat: 37.5655, lng: 126.9772 },
+            { id: 'gs_3', name: 'GS25 광화문점', lat: 37.5690, lng: 126.9780 }
+        ];
         places.forEach(p => {
-            const icon = L.divIcon({ className: 'custom-div-icon', html: `<div class="place-marker">GS</div>`, iconSize: [42, 42] });
+            const icon = L.divIcon({ className: 'custom-div-icon', html: `<div class="emoji-marker">🏪</div>`, iconSize: [40, 40] });
             const marker = L.marker([p.lat, p.lng], { icon }).addTo(map);
-            marker.on('click', () => {
-                activeContext = { gs_id: p.id, data: { name: p.name } };
-                document.getElementById('board-name-display').innerText = p.name;
-                openBoardList();
-            });
+            marker.on('click', () => { activeContext = { type: 'place', id: p.id, data: { text: p.name, emoji: '🏪', createdAt: Date.now() } }; openDetailView(); });
             markers.place.push(marker);
         });
     }
-    function openBoardList() {
-        const list = document.getElementById('board-post-list');
-        const posts = JSON.parse(localStorage.getItem(`board_${activeContext.gs_id}`) || '[]');
-        list.innerHTML = posts.length ? '' : '<div style="text-align:center;color:#999;padding:20px;">첫 글을 남겨보세요!</div>';
-        
-        posts.sort((a,b) => b.createdAt - a.createdAt).forEach(p => {
-            const timeStr = new Date(p.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            let mediaHTML = '';
-            if (p.media) mediaHTML = p.media.type === 'video' ? `<video class="feed-media" src="${p.media.url}"></video>` : `<img class="feed-media" src="${p.media.url}">`;
-            
-            const div = document.createElement('div');
-            div.className = 'feed-item';
-            div.innerHTML = `<div class="feed-header"><span class="feed-emoji">💬</span><span>${p.text}</span><span class="feed-time">${timeStr}</span></div>${mediaHTML}`;
-            div.onclick = () => {
-                activeContext = { type: 'board', gs_id: activeContext.gs_id, id: p.id, data: p };
-                openDetailView();
-            };
-            list.appendChild(div);
-        });
-        openSheet('sheet-board-list');
-    }
-    function submitBoardPost() {
-        const input = document.getElementById('board-input-text');
-        if (!input.value.trim() && !tempMedia.board.url) return;
-        const posts = JSON.parse(localStorage.getItem(`board_${activeContext.gs_id}`) || '[]');
-        posts.push({ id: Date.now(), text: input.value, createdAt: Date.now(), media: tempMedia.board.url ? {...tempMedia.board} : null });
-        localStorage.setItem(`board_${activeContext.gs_id}`, JSON.stringify(posts));
-        input.value = ''; clearMedia('board'); openBoardList();
-    }
 
-    // --- 공통 상세 뷰 (드롭 & 게시판 게시물 모두 사용) ---
     function openDetailView() {
         const c = activeContext;
-        document.getElementById('detail-emoji').innerText = c.type === 'drop' ? c.data.emoji : '💬';
+        document.getElementById('detail-emoji').innerText = c.data.emoji;
         document.getElementById('detail-title').innerText = c.data.text;
         
         const subEl = document.getElementById('detail-subtitle');
@@ -318,73 +318,116 @@
         if (c.type === 'drop') {
             subEl.style.color = '#ff3b30';
             startTimer(c.data.createdAt, subEl);
-            document.getElementById('detail-back-btn').style.display = 'none';
+            document.getElementById('detail-author').innerText = `👤 ${c.data.author}`;
+            document.getElementById('detail-dm-btn').style.display = 'block';
         } else {
             subEl.style.color = '#888';
-            subEl.innerText = new Date(c.data.createdAt).toLocaleString();
+            subEl.innerText = '이 장소의 영구적인 기록입니다.';
             if (activeInterval) clearInterval(activeInterval);
-            document.getElementById('detail-back-btn').style.display = 'block'; // 게시판에서 왔으면 뒤로가기 보임
+            document.getElementById('detail-author').innerText = `🏪 시스템`;
+            document.getElementById('detail-dm-btn').style.display = 'none';
         }
 
-        if (c.data.media) {
-            const m = c.data.media;
-            document.getElementById('detail-main-media').innerHTML = m.type === 'video' ? `<video class="media-preview" src="${m.url}" controls autoplay muted loop></video>` : `<img class="media-preview" src="${m.url}">`;
-        }
+        if (c.data.media) document.getElementById('detail-main-media').innerHTML = `<img class="feed-media" src="${c.data.media.url}">`;
 
         renderComments();
         openSheet('sheet-detail');
     }
+
     function renderComments() {
         const list = document.getElementById('detail-comment-list');
-        const key = activeContext.type === 'drop' ? `comments_drop_${activeContext.id}` : `comments_board_${activeContext.id}`;
+        const key = `comments_${activeContext.type}_${activeContext.id}`;
         const comments = JSON.parse(localStorage.getItem(key) || '[]');
-        list.innerHTML = comments.length ? '' : '<div style="text-align:center;color:#999;padding:20px;font-size:13px;">가장 먼저 댓글을 달아보세요!</div>';
+        list.innerHTML = comments.length ? '' : '<div style="text-align:center;color:#999;padding:20px 0;font-size:13px;">가장 먼저 흔적을 남겨보세요!</div>';
         
         comments.forEach(c => {
-            let mediaHTML = '';
-            if (c.media) mediaHTML = c.media.type === 'video' ? `<video class="feed-media" src="${c.media.url}" controls muted></video>` : `<img class="feed-media" src="${c.media.url}">`;
-            list.innerHTML += `<div class="feed-item comment"><div>${c.text}</div>${mediaHTML}</div>`;
+            let mediaHTML = c.media ? `<img class="feed-media" src="${c.media.url}">` : '';
+            list.innerHTML += `<div class="feed-item"><div class="feed-header">익명</div><div>${c.text}</div>${mediaHTML}</div>`;
         });
-        const scrollable = document.querySelector('#sheet-detail .scrollable-content');
+        const scrollable = document.getElementById('detail-scroll-area');
         scrollable.scrollTop = scrollable.scrollHeight;
     }
+
     function submitComment() {
         const input = document.getElementById('detail-comment-input');
         if (!input.value.trim() && !tempMedia.comment.url) return;
-        const key = activeContext.type === 'drop' ? `comments_drop_${activeContext.id}` : `comments_board_${activeContext.id}`;
+        const key = `comments_${activeContext.type}_${activeContext.id}`;
         const comments = JSON.parse(localStorage.getItem(key) || '[]');
         comments.push({ text: input.value, time: Date.now(), media: tempMedia.comment.url ? {...tempMedia.comment} : null });
         localStorage.setItem(key, JSON.stringify(comments));
         input.value = ''; clearMedia('comment'); renderComments();
     }
 
-    function goBackToBoard() {
-        activeContext = { gs_id: activeContext.gs_id, data: {name: document.getElementById('board-name-display').innerText} };
-        openBoardList();
+    function startDM() {
+        const targetUser = activeContext.data.author;
+        activeDMRoom = targetUser;
+        const dms = JSON.parse(localStorage.getItem('dms') || '{}');
+        if(!dms[targetUser]) dms[targetUser] = [];
+        localStorage.setItem('dms', JSON.stringify(dms));
+        
+        document.getElementById('dm-room-title').innerText = targetUser;
+        openSheet('sheet-dm-room');
+        renderDMMessages();
     }
 
-    // --- 미디어 처리 ---
+    function renderDMList() {
+        const dms = JSON.parse(localStorage.getItem('dms') || '{}');
+        const list = document.getElementById('dm-list-container');
+        list.innerHTML = '';
+        const users = Object.keys(dms);
+        if(users.length === 0) { list.innerHTML = '<div style="text-align:center;color:#999;padding:40px 20px;">대화중인 메시지가 없습니다.</div>'; openSheet('sheet-dm-list'); return; }
+
+        users.forEach(user => {
+            const msgs = dms[user];
+            const lastMsg = msgs.length > 0 ? msgs[msgs.length-1].text : '대화를 시작하세요!';
+            const div = document.createElement('div'); div.className = 'dm-list-item';
+            div.innerHTML = `<div class="dm-avatar">${user.slice(3,4)}</div><div style="flex:1;"><div style="font-weight:bold; font-size:14px; margin-bottom:4px;">${user}</div><div style="font-size:13px; color:#888;">${lastMsg}</div></div>`;
+            div.onclick = () => { activeDMRoom = user; document.getElementById('dm-room-title').innerText = user; openSheet('sheet-dm-room'); renderDMMessages(); };
+            list.appendChild(div);
+        });
+        openSheet('sheet-dm-list');
+    }
+
+    function renderDMMessages() {
+        const dms = JSON.parse(localStorage.getItem('dms') || '{}');
+        const msgs = dms[activeDMRoom] || [];
+        const list = document.getElementById('dm-message-list');
+        list.innerHTML = msgs.length ? '' : '<div style="text-align:center;color:#999;padding:20px;">매너있게 대화를 시작해보세요.</div>';
+        
+        msgs.forEach(m => {
+            const align = m.fromMe ? 'align-self: flex-end; background: #007aff; color: #fff; border:none;' : 'align-self: flex-start; background: #f4f5f7; border:none;';
+            list.innerHTML += `<div style="padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; width: fit-content; max-width: 80%; margin-bottom: 8px; ${align}">${m.text}</div>`;
+        });
+        list.style.display = 'flex'; list.style.flexDirection = 'column';
+        list.scrollTop = list.scrollHeight;
+    }
+
+    function sendDMMessage() {
+        const input = document.getElementById('dm-input-text');
+        if(!input.value.trim()) return;
+        const dms = JSON.parse(localStorage.getItem('dms') || '{}');
+        dms[activeDMRoom].push({ text: input.value, fromMe: true, time: Date.now() });
+        localStorage.setItem('dms', JSON.stringify(dms));
+        input.value = ''; renderDMMessages();
+    }
+
     function handleFileUpload(event, target) {
         const file = event.target.files[0];
         if (!file) return;
         const objectUrl = URL.createObjectURL(file);
-        const type = file.type.startsWith('video') ? 'video' : 'image';
-        tempMedia[target] = { url: objectUrl, type: type };
-        
-        const box = document.getElementById(`${target}-media-preview-box`);
-        box.classList.add('active');
-        const imgEl = document.getElementById(`${target}-media-preview`);
-        const vidEl = document.getElementById(`${target}-media-preview-vid`);
-        if (type === 'video') { imgEl.style.display = 'none'; vidEl.style.display = 'block'; vidEl.src = objectUrl; } 
-        else { vidEl.style.display = 'none'; imgEl.style.display = 'block'; imgEl.src = objectUrl; }
+        tempMedia[target] = { url: objectUrl };
+        document.getElementById(`${target}-media-preview-box`).classList.add('active');
+        document.getElementById(`${target}-media-preview`).src = objectUrl;
+        document.getElementById(`${target}-camera-btn`).classList.add('has-file');
     }
+    
     function clearMedia(target) {
-        tempMedia[target] = { url: null, type: null };
+        tempMedia[target] = { url: null };
         document.getElementById(`${target}-media-preview-box`).classList.remove('active');
         document.getElementById(`${target}-file-input`).value = '';
+        document.getElementById(`${target}-camera-btn`).classList.remove('has-file');
     }
 
-    // --- 유틸리티 ---
     function selectEmoji(el, emoji) {
         document.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
         el.classList.add('selected'); currentEmoji = emoji;
@@ -398,7 +441,7 @@
         document.getElementById('overlay').classList.remove('active');
         document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('active'));
         if (activeInterval) clearInterval(activeInterval);
-        ['create', 'board', 'comment'].forEach(clearMedia);
+        ['create', 'comment'].forEach(clearMedia);
     }
     function startTimer(created, targetElement) {
         if (activeInterval) clearInterval(activeInterval);
