@@ -290,3 +290,24 @@ function startTimer(created, targetElement) {
 }
 
 renderLayers();
+
+// --- 키보드 및 모바일 뷰포트 대응 ---
+if (window.visualViewport) {
+    const handleViewportChange = () => {
+        const app = document.getElementById('app-container');
+        // 앱 컨테이너 높이를 뷰포트 높이로 강제 조정 (키보드 등장 시 화면 밀림 방지)
+        app.style.height = `${window.visualViewport.height}px`;
+        
+        // 입력창이 활성화된 경우 화면 중앙으로 스크롤하여 가림 방지
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl.tagName === 'INPUT') {
+            setTimeout(() => {
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    };
+    
+    window.visualViewport.addEventListener('resize', handleViewportChange);
+    // 스크롤 시에도 보정 (필요 시)
+    window.visualViewport.addEventListener('scroll', handleViewportChange);
+}
