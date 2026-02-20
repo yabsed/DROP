@@ -1,49 +1,85 @@
 import React from 'react';
+import { Stack, Group, Avatar, Title, Text, ScrollArea, Card, Image, Box, TextInput, FileButton, ActionIcon } from '@mantine/core';
 
 export function DetailModal({ activeContext, remaining, comments, commentMedia, setCommentMedia, commentText, setCommentText, onFileUpload, submitComment }) {
   return (
-    <section className="sheet detail-sheet">
-      <header className="detail-head">
-        <div className="emoji">{activeContext.data.emoji}</div>
-        <div>
-          <h3>{activeContext.data.text}</h3>
-          <p className={activeContext.type === 'drop' ? 'warn' : ''}>
+    <Stack h="100%" gap="md" p="md">
+      <Group>
+        <Avatar size="xl" radius="xl" color="blue" variant="light">
+          {activeContext.data.emoji || '📍'}
+        </Avatar>
+        <Stack gap={0}>
+          <Title order={4}>{activeContext.data.text || 'Unknown Spot'}</Title>
+          <Text c={activeContext.type === 'drop' ? 'red' : 'dimmed'} size="sm">
             {activeContext.type === 'drop' ? remaining : '러닝 코스의 고정 스팟입니다.'}
-          </p>
-        </div>
-      </header>
+          </Text>
+        </Stack>
+      </Group>
 
-      <div className="feed-list">
-        {activeContext.data.media?.url && <img className="feed-media" src={activeContext.data.media.url} alt="Feed" />}
-        {comments.length === 0 && <div className="empty">가장 먼저 흔적을 남겨보세요!</div>}
-        {comments.map((item) => (
-          <article key={item.time} className="feed-item">
-            <div className="feed-header">익명 러너</div>
-            <p>{item.text}</p>
-            {item.media?.url && <img className="feed-media" src={item.media.url} alt="Comment" />}
-          </article>
-        ))}
-      </div>
+      <ScrollArea style={{ height: 300 }} offsetScrollbars scrollbarSize={6}>
+        {activeContext.data.media?.url && (
+            <Image src={activeContext.data.media.url} radius="md" mb="sm" alt="Feed" />
+        )}
+        
+        {comments.length === 0 && !activeContext.data.media?.url && (
+            <Text c="dimmed" ta="center" py="xl">가장 먼저 흔적을 남겨보세요!</Text>
+        )}
+        
+        <Stack gap="sm">
+            {comments.map((item) => (
+            <Card key={item.time} withBorder padding="sm" radius="md">
+                <Text size="xs" fw={700} c="dimmed" mb={4}>익명 러너</Text>
+                <Text size="sm">{item.text}</Text>
+                {item.media?.url && (
+                    <Image src={item.media.url} radius="sm" mt="xs" />
+                )}
+            </Card>
+            ))}
+        </Stack>
+      </ScrollArea>
 
-      <div className="compose-card">
+      <Card withBorder padding="sm" radius="md" bg="gray.0">
         {commentMedia?.url && (
-          <div className="media-preview-wrap">
-            <img src={commentMedia.url} className="media-preview" alt="Preview" />
-            <button onClick={() => setCommentMedia(null)}>✕</button>
-          </div>
+            <Box pos="relative" mb="sm">
+                <Image src={commentMedia.url} radius="md" mah={100} style={{ objectFit: 'cover' }} />
+                <ActionIcon 
+                    variant="filled" 
+                    color="dark" 
+                    size="xs" 
+                    radius="xl" 
+                    pos="absolute" 
+                    top={5} 
+                    right={5}
+                    onClick={() => setCommentMedia(null)}
+                >
+                    ✕
+                </ActionIcon>
+            </Box>
         )}
 
-        <div className="chat-input-wrap">
-          <label className={`media-btn ${commentMedia ? 'has-file' : ''}`}>
-            📷
-            <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'comment')} />
-          </label>
-          <div className="input-pill">
-            <input value={commentText} onChange={(event) => setCommentText(event.target.value)} placeholder="스팟에 흔적 남기기..." />
-            <button onClick={submitComment}>➤</button>
-          </div>
-        </div>
-      </div>
-    </section>
+        <Group gap="xs" align="center">
+          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'comment')} accept="image/*">
+            {(props) => (
+              <ActionIcon {...props} variant={commentMedia ? 'filled' : 'light'} color="blue" size="lg" radius="xl">
+                📷
+              </ActionIcon>
+            )}
+          </FileButton>
+          
+          <TextInput
+            placeholder="스팟에 흔적 남기기..."
+            value={commentText}
+            onChange={(event) => setCommentText(event.target.value)}
+            style={{ flex: 1 }}
+            radius="xl"
+            rightSection={
+                <ActionIcon variant="transparent" color="blue" onClick={submitComment} disabled={!commentText && !commentMedia}>
+                    ➤
+                </ActionIcon>
+            }
+          />
+        </Group>
+      </Card>
+    </Stack>
   );
 }

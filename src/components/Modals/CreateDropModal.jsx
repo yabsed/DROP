@@ -1,39 +1,71 @@
 import React from 'react';
+import { Stack, Title, SimpleGrid, ActionIcon, Card, Image, Group, TextInput, FileButton, Box } from '@mantine/core'; // Added Box import
 import { EMOJIS } from '../../constants/data';
 
 export function CreateDropModal({ selectedEmoji, setSelectedEmoji, draftMedia, setDraftMedia, draftText, setDraftText, onFileUpload, submitDrop }) {
   return (
-    <section className="sheet create-sheet">
-      <header>
-        <h3>지금 나의 러닝 바이브</h3>
-      </header>
-      <div className="emoji-picker">
+    <Stack p="md" gap="lg">
+      <Title order={3} ta="center" fz="lg">지금 나의 러닝 바이브</Title>
+      
+      <SimpleGrid cols={5} spacing="xs">
         {EMOJIS.map((emoji) => (
-          <button key={emoji} className={`emoji-option ${selectedEmoji === emoji ? 'selected' : ''}`} onClick={() => setSelectedEmoji(emoji)}>
+          <ActionIcon
+            key={emoji}
+            variant={selectedEmoji === emoji ? 'filled' : 'default'}
+            color={selectedEmoji === emoji ? 'blue' : 'gray'}
+            onClick={() => setSelectedEmoji(emoji)}
+            size="xl"
+            radius="xl"
+            style={{ fontSize: '1.5rem', height: '3.5rem', width: '3.5rem' }}
+          >
             {emoji}
-          </button>
+          </ActionIcon>
         ))}
-      </div>
+      </SimpleGrid>
 
-      <div className="compose-card">
+      <Card withBorder padding="sm" radius="md" bg="gray.0">
         {draftMedia?.url && (
-          <div className="media-preview-wrap">
-            <img src={draftMedia.url} className="media-preview" alt="Preview" />
-            <button onClick={() => setDraftMedia(null)}>✕</button>
-          </div>
+            <Box pos="relative" mb="sm">
+                <Image src={draftMedia.url} radius="md" />
+                <ActionIcon 
+                    variant="filled" 
+                    color="dark" 
+                    size="sm" 
+                    radius="xl" 
+                    pos="absolute" 
+                    top={5} 
+                    right={5}
+                    onClick={() => setDraftMedia(null)}
+                >
+                    ✕
+                </ActionIcon>
+            </Box>
         )}
 
-        <div className="chat-input-wrap">
-          <label className={`media-btn ${draftMedia ? 'has-file' : ''}`}>
-            📷
-            <input type="file" accept="image/*" onChange={(event) => onFileUpload(event, 'create')} />
-          </label>
-          <div className="input-pill">
-            <input value={draftText} maxLength={20} onChange={(event) => setDraftText(event.target.value)} placeholder="오늘 러닝 어때요?" />
-            <button onClick={submitDrop}>➤</button>
-          </div>
-        </div>
-      </div>
-    </section>
+        <Group gap="xs" align="center">
+          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'create')} accept="image/*">
+            {(props) => (
+              <ActionIcon {...props} variant={draftMedia ? 'filled' : 'light'} color="blue" size="lg" radius="xl">
+                📷
+              </ActionIcon>
+            )}
+          </FileButton>
+          
+          <TextInput
+            placeholder="오늘 러닝 어때요?"
+            value={draftText}
+            onChange={(event) => setDraftText(event.target.value)}
+            maxLength={20}
+            style={{ flex: 1 }}
+            radius="xl"
+            rightSection={
+                <ActionIcon variant="transparent" color="blue" onClick={submitDrop} disabled={!draftText && !draftMedia}>
+                    ➤
+                </ActionIcon>
+            }
+          />
+        </Group>
+      </Card>
+    </Stack>
   );
 }

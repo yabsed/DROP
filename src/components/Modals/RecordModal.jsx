@@ -1,4 +1,5 @@
 import React from 'react';
+import { Stack, Group, Avatar, Title, Text, SegmentedControl, Paper } from '@mantine/core';
 import { RECORD_DATA } from '../../constants/data';
 
 export function RecordModal({ recordKey, recordPeriod, setRecordPeriod }) {
@@ -11,28 +12,41 @@ export function RecordModal({ recordKey, recordPeriod, setRecordPeriod }) {
   }
 
   return (
-    <section className="sheet record-sheet">
-      <header className="detail-head">
-        <div className="emoji">{record.icon}</div>
-        <div>
-          <h3>{recordKey}</h3>
-          <p>{record.desc}</p>
-        </div>
-      </header>
+    <Stack gap="lg" p="md">
+      <Group>
+        <Avatar size="xl" radius="xl" color="indigo" variant="light">
+          {record.icon}
+        </Avatar>
+        <Stack gap={0}>
+          <Title order={4}>{recordKey}</Title>
+          <Text size="sm" c="dimmed">
+            {record.desc}
+          </Text>
+        </Stack>
+      </Group>
 
-      <div className="stat-tabs">
-        {['D', 'W', 'M'].map((period) => (
-          <button key={period} className={recordPeriod === period ? 'active' : ''} onClick={() => setRecordPeriod(period)}>
-            {period === 'D' ? '일간' : period === 'W' ? '주간' : '월간'}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        value={recordPeriod}
+        onChange={setRecordPeriod}
+        fullWidth
+        data={[
+          { label: '일간', value: 'D' },
+          { label: '주간', value: 'W' },
+          { label: '월간', value: 'M' },
+        ]}
+      />
 
-      <div className="stat-box">
-        <strong>{record[recordPeriod]}</strong>
-        <span>{record.unit}</span>
-        <p>{recordPeriodText(recordPeriod)} 누적 기록입니다.</p>
-      </div>
-    </section>
+      <Paper withBorder p="xl" radius="md" bg="gray.0" ta="center">
+        <Text fz={40} fw={700} lh={1} c="indigo">
+          {record[recordPeriod]}
+          <Text span fz="md" fw={500} c="dimmed" ml={4}>
+            {record.unit}
+          </Text>
+        </Text>
+        <Text size="sm" c="dimmed" mt="sm">
+          {recordPeriodText(recordPeriod)} 누적 기록입니다.
+        </Text>
+      </Paper>
+    </Stack>
   );
 }

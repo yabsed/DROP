@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Box, Container, Modal, Button, ActionIcon, Text, Alert, Center, Loader, rem } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Map } from './components/Map';
 import { LayerToggle } from './components/LayerToggle/LayerToggle';
 import { RecordView } from './components/RecordView/RecordView';
@@ -10,7 +12,8 @@ import { getStorage } from './utils/storage';
 
 export default function App() {
   const selectedLatLngRef = useRef(null);
-
+  
+  // existing state
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState('');
   const [layer, setLayer] = useState(LAYER.DROP);
@@ -118,45 +121,69 @@ export default function App() {
   }
 
   return (
-    <div className="desktop-bg">
-      <div className="app-shell">
-        <main className="phone-stage">
-          <LayerToggle layer={layer} setLayer={setLayer} setIsDropMode={setIsDropMode} />
+    <Box h="100vh" w="100vw" pos="relative" bg="white" style={{ overflow: 'hidden' }}>
+      <LayerToggle layer={layer} setLayer={setLayer} setIsDropMode={setIsDropMode} />
 
-          {isDropMode && layer === LAYER.DROP && <div className="guide-msg">📍 지도를 클릭하여 위치를 남기세요</div>}
+      {isDropMode && layer === LAYER.DROP && (
+          <Alert 
+            color="blue" 
+            variant="light" 
+            pos="absolute" 
+            top={70} 
+            left="50%" 
+            style={{ transform: 'translateX(-50%)', zIndex: 1000, whiteSpace: 'nowrap' }}
+          >
+            📍 지도를 클릭하여 위치를 남기세요
+          </Alert>
+        )}
 
-          <Map
-            layer={layer}
-            isDropMode={isDropMode}
-            drops={drops}
-            onMapClick={onMapClick}
-            onMarkerClick={onMarkerClick}
-            setMapReady={setMapReady}
-            setMapError={setMapError}
-          />
-          
-          {!mapReady && !mapError && layer !== LAYER.RECORD && (
-            <div className="map-fallback">지도를 준비 중입니다...</div>
-          )}
-          {mapError && layer !== LAYER.RECORD && <div className="map-fallback error">{mapError}</div>}
+        <Map
+          layer={layer}
+          isDropMode={isDropMode}
+          drops={drops}
+          onMapClick={onMapClick}
+          onMarkerClick={onMarkerClick}
+          setMapReady={setMapReady}
+          setMapError={setMapError}
+        />
+        
+        {!mapReady && !mapError && layer !== LAYER.RECORD && (
+          <Center pos="absolute" top={0} left={0} w="100%" h="100%" bg="white" style={{ zIndex: 5 }}>
+            <Loader size="lg" />
+            <Text ml="md">지도를 준비 중입니다...</Text>
+          </Center>
+        )}
+        {mapError && layer !== LAYER.RECORD && (
+          <Center pos="absolute" top={0} left={0} w="100%" h="100%" bg="white" style={{ zIndex: 5 }}>
+             <Text c="red">{mapError}</Text>
+          </Center>
+        )}
 
-          <RecordView
-            layer={layer}
-            setRecordKey={setRecordKey}
-            setRecordPeriod={setRecordPeriod}
-            setActiveModal={setActiveModal}
-          />
+        <RecordView
+          layer={layer}
+          setRecordKey={setRecordKey}
+          setRecordPeriod={setRecordPeriod}
+          setActiveModal={setActiveModal}
+        />
 
-          {layer === LAYER.DROP && (
-            <button className={`fab-drop ${isDropMode ? 'cancel' : ''}`} onClick={toggleDrop} aria-label="drop">
-              <span />
-            </button>
-          )}
-        </main>
+        {layer === LAYER.DROP && (
+          <ActionIcon 
+            variant="filled" 
+            color={isDropMode ? "red" : "blue"} 
+            size={56} 
+            radius="xl" 
+            pos="absolute" 
+            bottom={30} 
+            right={20} 
+            onClick={toggleDrop} 
+            aria-label="drop"
+            style={{ zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+          >
+            <span style={{ fontSize: 24 }}>{isDropMode ? '✕' : '+'}</span>
+          </ActionIcon>
+        )}
 
-        {activeModal && <div className="overlay" onClick={closeModal} />}
-
-        {activeModal === 'create' && (
+        <Modal opened={activeModal === 'create'} onClose={closeModal} withCloseButton={false} centered padding={0}>
           <CreateDropModal
             selectedEmoji={selectedEmoji}
             setSelectedEmoji={setSelectedEmoji}
@@ -167,30 +194,31 @@ export default function App() {
             onFileUpload={onFileUpload}
             submitDrop={submitDrop}
           />
-        )}
+        </Modal>
 
-        {activeModal === 'detail' && activeContext && (
-          <DetailModal
-            activeContext={activeContext}
-            remaining={remaining}
-            comments={comments}
-            commentMedia={commentMedia}
-            setCommentMedia={setCommentMedia}
-            commentText={commentText}
-            setCommentText={setCommentText}
-            onFileUpload={onFileUpload}
-            submitComment={submitComment}
-          />
-        )}
+        <Modal opened={activeModal === 'detail' && !!activeContext} onClose={closeModal} withCloseButton={false} centered padding={0}>
+          {activeContext && (
+            <DetailModal
+              activeContext={activeContext}
+              remaining={remaining}
+              comments={comments}
+              commentMedia={commentMedia}
+              setCommentMedia={setCommentMedia}
+              commentText={commentText}
+              setCommentText={setCommentText}
+              onFileUpload={onFileUpload}
+              submitComment={submitComment}
+            />
+          )}
+        </Modal>
 
-        {activeModal === 'record' && (
+        <Modal opened={activeModal === 'record'} onClose={closeModal} withCloseButton={false} centered padding={0}>
           <RecordModal
             recordKey={recordKey}
             recordPeriod={recordPeriod}
             setRecordPeriod={setRecordPeriod}
           />
-        )}
-      </div>
-    </div>
+        </Modal>
+    </Box>
   );
 }
