@@ -221,7 +221,7 @@
 
     // --- 레이어 전환 ---
     function switchLayer(layer) {
-        currentLayer = layer;
+        currentLayer = layer; 
         document.getElementById('btn-layer-drop').classList.toggle('active', layer === 'drop');
         document.getElementById('btn-layer-place').classList.toggle('active', layer === 'place');
         document.getElementById('fab-drop').style.display = (layer === 'drop') ? 'flex' : 'none';
