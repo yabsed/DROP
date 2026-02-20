@@ -4,4 +4,16 @@ html, body, #root { height: 100%; margin: 0; padding: 0; font-family: 'Pretendar
 .map.hidden { display: none; }
 .emoji-pin-wrapper { background: transparent; border: none; }
 .emoji-pin { font-size: 34px; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25)); animation: float 2s infinite ease-in-out; text-align: center; line-height: 44px; }
+
+.media-pin {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  animation: float 2s infinite ease-in-out;
+  background-color: white;
+}
+
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }

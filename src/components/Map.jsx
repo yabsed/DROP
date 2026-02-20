@@ -70,9 +70,18 @@ export function Map({ layer, isDropMode, drops, onMapClick, onMarkerClick, setMa
 
     if (layer === LAYER.DROP) {
       drops.forEach((drop) => {
+        let htmlContent;
+        if (drop.media && drop.media.type?.startsWith('video/')) {
+            htmlContent = `<video src="${drop.media.url}" class="media-pin" autoplay muted loop playsinline></video>`;
+        } else if (drop.media && drop.media.type?.startsWith('image/')) {
+            htmlContent = `<img src="${drop.media.url}" class="media-pin" />`;
+        } else {
+            htmlContent = `<div class="emoji-pin">${drop.emoji}</div>`;
+        }
+
         const icon = L.divIcon({
           className: 'emoji-pin-wrapper',
-          html: `<div class="emoji-pin">${drop.emoji}</div>`,
+          html: htmlContent,
           iconSize: [44, 44]
         });
         const marker = L.marker([drop.lat, drop.lng], { icon });

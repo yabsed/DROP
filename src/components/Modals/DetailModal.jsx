@@ -18,7 +18,11 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
 
       <ScrollArea style={{ flex: 1, minHeight: 100, maxHeight: '40vh' }} offsetScrollbars scrollbarSize={6}>
         {activeContext.data.media?.url && (
-            <Image src={activeContext.data.media.url} radius="md" mb="sm" alt="Feed" />
+            activeContext.data.media.type?.startsWith('video/') ? (
+                <video src={activeContext.data.media.url} controls style={{ width: '100%', borderRadius: '8px', marginBottom: '8px' }} playsInline />
+            ) : (
+                <Image src={activeContext.data.media.url} radius="md" mb="sm" alt="Feed" />
+            )
         )}
         
         {comments.length === 0 && !activeContext.data.media?.url && (
@@ -31,7 +35,11 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
                 <Text size="xs" fw={700} c="dimmed" mb={4}>익명 러너</Text>
                 <Text size="sm">{item.text}</Text>
                 {item.media?.url && (
-                    <Image src={item.media.url} radius="sm" mt="xs" />
+                    item.media.type?.startsWith('video/') ? (
+                        <video src={item.media.url} controls style={{ width: '100%', borderRadius: '4px', marginTop: '8px' }} playsInline />
+                    ) : (
+                        <Image src={item.media.url} radius="sm" mt="xs" />
+                    )
                 )}
             </Card>
             ))}
@@ -41,7 +49,11 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
       <Card withBorder padding="sm" radius="md" bg="gray.0">
         {commentMedia?.url && (
             <Box pos="relative" mb="sm">
-                <Image src={commentMedia.url} radius="md" mah={100} style={{ objectFit: 'cover' }} />
+                {commentMedia.type?.startsWith('video/') ? (
+                    <video src={commentMedia.url} style={{ width: '100%', maxHeight: '100px', borderRadius: '8px', objectFit: 'cover' }} autoPlay loop muted playsInline />
+                ) : (
+                    <Image src={commentMedia.url} radius="md" mah={100} style={{ objectFit: 'cover' }} />
+                )}
                 <ActionIcon 
                     variant="filled" 
                     color="dark" 
@@ -58,7 +70,7 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
         )}
 
         <Group gap="xs" align="center">
-          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'comment')} accept="image/*">
+          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'comment')} accept="image/*,video/*">
             {(props) => (
               <ActionIcon {...props} variant={commentMedia ? 'filled' : 'light'} color="blue" size="lg" radius="xl">
                 📷

@@ -26,7 +26,11 @@ export function CreateDropModal({ selectedEmoji, setSelectedEmoji, draftMedia, s
       <Card withBorder padding="sm" radius="md" bg="gray.0">
         {draftMedia?.url && (
             <Box pos="relative" mb="sm">
-                <Image src={draftMedia.url} radius="md" />
+                {draftMedia.type?.startsWith('video/') ? (
+                    <video src={draftMedia.url} style={{ width: '100%', borderRadius: '8px' }} autoPlay loop muted playsInline />
+                ) : (
+                    <Image src={draftMedia.url} radius="md" />
+                )}
                 <ActionIcon 
                     variant="filled" 
                     color="dark" 
@@ -43,7 +47,7 @@ export function CreateDropModal({ selectedEmoji, setSelectedEmoji, draftMedia, s
         )}
 
         <Group gap="xs" align="center">
-          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'create')} accept="image/*">
+          <FileButton onChange={(file) => onFileUpload({ target: { files: [file] } }, 'create')} accept="image/*,video/*">
             {(props) => (
               <ActionIcon {...props} variant={draftMedia ? 'filled' : 'light'} color="blue" size="lg" radius="xl">
                 📷

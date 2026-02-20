@@ -121,8 +121,9 @@ export default function App() {
     const file = event.target.files?.[0];
     if (!file) return;
     const objectUrl = URL.createObjectURL(file);
-    if (target === 'create') setDraftMedia({ url: objectUrl });
-    if (target === 'comment') setCommentMedia({ url: objectUrl });
+    const media = { url: objectUrl, type: file.type };
+    if (target === 'create') setDraftMedia(media);
+    if (target === 'comment') setCommentMedia(media);
   }
 
   return (
