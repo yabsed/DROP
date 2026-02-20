@@ -35,6 +35,11 @@ export default function App() {
   }, [drops]);
 
   useEffect(() => {
+    // 레이어 변경 시 모달 닫기
+    setActiveModal(null);
+  }, [layer]);
+
+  useEffect(() => {
     const now = Date.now();
     const validDrops = drops.filter((drop) => now - drop.createdAt < 15 * 60 * 1000);
     if (validDrops.length !== drops.length) setDrops(validDrops);
