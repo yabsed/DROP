@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Container, Modal, Button, ActionIcon, Text, Alert, Center, Loader, rem } from '@mantine/core';
+import { Box, Center, Loader, Text, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Map } from './components/Map';
 import { LayerToggle } from './components/LayerToggle/LayerToggle';
-import { RecordView } from './components/RecordView/RecordView';
-import { CreateDropModal } from './components/Modals/CreateDropModal';
-import { DetailModal } from './components/Modals/DetailModal';
-import { RecordModal } from './components/Modals/RecordModal';
-import { LAYER } from './constants/data';
+import { RecordView } from './features/MyRecords/RecordView';
+import { RecordModal } from './features/MyRecords/RecordModal';
+import { RunnerManager } from './features/Runners/RunnerManager';
+import { SpotManager } from './features/Spots/SpotManager';
+import { LAYER } from './utils/data';
 import { getStorage } from './utils/storage';
 
 export default function App() {
@@ -121,21 +121,46 @@ export default function App() {
   }
 
   return (
-    <Box h="100vh" w="100vw" pos="relative" bg="white" style={{ overflow: 'hidden' }}>
+    <Box h="100dvh" w="100vw" pos="relative" bg="white" style={{ overflow: 'hidden' }}>
       <LayerToggle layer={layer} setLayer={setLayer} setIsDropMode={setIsDropMode} />
 
-      {isDropMode && layer === LAYER.DROP && (
-          <Alert 
-            color="blue" 
-            variant="light" 
-            pos="absolute" 
-            top={70} 
-            left="50%" 
-            style={{ transform: 'translateX(-50%)', zIndex: 1000, whiteSpace: 'nowrap' }}
-          >
-            📍 지도를 클릭하여 위치를 남기세요
-          </Alert>
-        )}
+      <RunnerManager 
+        layer={layer}
+        isDropMode={isDropMode}
+        toggleDrop={toggleDrop}
+        activeModal={activeModal}
+        closeModal={closeModal}
+        selectedEmoji={selectedEmoji}
+        setSelectedEmoji={setSelectedEmoji}
+        draftMedia={draftMedia}
+        setDraftMedia={setDraftMedia}
+        draftText={draftText}
+        setDraftText={setDraftText}
+        onFileUpload={onFileUpload}
+        submitDrop={submitDrop}
+        activeContext={activeContext}
+        remaining={remaining}
+        comments={comments}
+        commentMedia={commentMedia}
+        setCommentMedia={setCommentMedia}
+        commentText={commentText}
+        setCommentText={setCommentText}
+        submitComment={submitComment}
+      />
+
+      <SpotManager 
+        activeModal={activeModal}
+        activeContext={activeContext}
+        closeModal={closeModal}
+        remaining={remaining}
+        comments={comments}
+        commentMedia={commentMedia}
+        setCommentMedia={setCommentMedia}
+        commentText={commentText}
+        setCommentText={setCommentText}
+        onFileUpload={onFileUpload}
+        submitComment={submitComment}
+      />
 
         <Map
           layer={layer}
@@ -165,52 +190,6 @@ export default function App() {
           setRecordPeriod={setRecordPeriod}
           setActiveModal={setActiveModal}
         />
-
-        {layer === LAYER.DROP && (
-          <ActionIcon 
-            variant="filled" 
-            color={isDropMode ? "red" : "blue"} 
-            size={56} 
-            radius="xl" 
-            pos="absolute" 
-            bottom={30} 
-            right={20} 
-            onClick={toggleDrop} 
-            aria-label="drop"
-            style={{ zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
-          >
-            <span style={{ fontSize: 24 }}>{isDropMode ? '✕' : '+'}</span>
-          </ActionIcon>
-        )}
-
-        <Modal opened={activeModal === 'create'} onClose={closeModal} withCloseButton={false} centered padding={0}>
-          <CreateDropModal
-            selectedEmoji={selectedEmoji}
-            setSelectedEmoji={setSelectedEmoji}
-            draftMedia={draftMedia}
-            setDraftMedia={setDraftMedia}
-            draftText={draftText}
-            setDraftText={setDraftText}
-            onFileUpload={onFileUpload}
-            submitDrop={submitDrop}
-          />
-        </Modal>
-
-        <Modal opened={activeModal === 'detail' && !!activeContext} onClose={closeModal} withCloseButton={false} centered padding={0}>
-          {activeContext && (
-            <DetailModal
-              activeContext={activeContext}
-              remaining={remaining}
-              comments={comments}
-              commentMedia={commentMedia}
-              setCommentMedia={setCommentMedia}
-              commentText={commentText}
-              setCommentText={setCommentText}
-              onFileUpload={onFileUpload}
-              submitComment={submitComment}
-            />
-          )}
-        </Modal>
 
         <Modal opened={activeModal === 'record'} onClose={closeModal} withCloseButton={false} centered padding={0}>
           <RecordModal

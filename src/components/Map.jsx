@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { LAYER, SPOTS } from '../constants/data';
+import { LAYER, SPOTS } from '../utils/data';
 
 export function Map({ layer, isDropMode, drops, onMapClick, onMarkerClick, setMapReady, setMapError }) {
   const mapNode = useRef(null);

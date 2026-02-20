@@ -16,7 +16,7 @@ export function DetailModal({ activeContext, remaining, comments, commentMedia, 
         </Stack>
       </Group>
 
-      <ScrollArea style={{ height: 300 }} offsetScrollbars scrollbarSize={6}>
+      <ScrollArea style={{ flex: 1, minHeight: 100, maxHeight: '40vh' }} offsetScrollbars scrollbarSize={6}>
         {activeContext.data.media?.url && (
             <Image src={activeContext.data.media.url} radius="md" mb="sm" alt="Feed" />
         )}

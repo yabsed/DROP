@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack, Group, Avatar, Title, Text, SegmentedControl, Paper } from '@mantine/core';
-import { RECORD_DATA } from '../../constants/data';
+import { RECORD_DATA } from '../../utils/data';
 
 export function RecordModal({ recordKey, recordPeriod, setRecordPeriod }) {
   const record = RECORD_DATA[recordKey];

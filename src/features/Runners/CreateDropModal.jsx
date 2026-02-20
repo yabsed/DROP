@@ -1,6 +1,6 @@
 import React from 'react';
-import { Stack, Title, SimpleGrid, ActionIcon, Card, Image, Group, TextInput, FileButton, Box } from '@mantine/core'; // Added Box import
-import { EMOJIS } from '../../constants/data';
+import { Stack, Title, SimpleGrid, ActionIcon, Card, Image, Group, TextInput, FileButton, Box } from '@mantine/core';
+import { EMOJIS } from '../../utils/data';
 
 export function CreateDropModal({ selectedEmoji, setSelectedEmoji, draftMedia, setDraftMedia, draftText, setDraftText, onFileUpload, submitDrop }) {
   return (

@@ -1,24 +1,21 @@
 import React from 'react';
 import { Box, SimpleGrid, Title, Text, UnstyledButton, Group, ThemeIcon, Stack, Paper } from '@mantine/core';
-import { LAYER, RECORD_DATA } from '../../constants/data';
+import { LAYER, RECORD_DATA } from '../../utils/data';
 
 export function RecordView({ layer, setRecordKey, setRecordPeriod, setActiveModal }) {
+  if (layer !== LAYER.RECORD) return null;
+
   return (
     <Box
-      pos="absolute"
-      bottom={0}
-      left={0}
       w="100%"
-      h="85%"
+      h="100%"
       bg="gray.0"
-      p="lg"
+      px="lg"
+      pt={80}
+      pb="xl"
       style={{
-        transform: layer === LAYER.RECORD ? 'translateY(0)' : 'translateY(100%)',
-        transition: 'transform 0.3s ease-in-out',
         zIndex: 1100,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
+        overflowY: 'auto',
       }}
     >
       <Title order={3} mb="lg">오늘의 러닝 요약</Title>

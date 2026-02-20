@@ -1,6 +1,6 @@
 import React from 'react';
 import { SegmentedControl, Box } from '@mantine/core';
-import { LAYER } from '../../constants/data';
+import { LAYER } from '../../utils/data';
 
 export function LayerToggle({ layer, setLayer, setIsDropMode }) {
   return (
